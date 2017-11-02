@@ -25,6 +25,9 @@ func (i *negateInverse) Inverse() CDF {
 	return i.n
 }
 
+/*
+Given a random variable X represented by a distribution, calculate -X.
+*/
 func Neg(cdf CDF) CDF {
 	return &negate{cdf}
 }
@@ -81,32 +84,45 @@ func (i *scaleInverse) Inverse() CDF {
 	return i.s
 }
 
-func AddScalar(cdf CDF, x float64) CDF {
-	return &shift{cdf, x}
+/*
+Given a random variable X represented by a distribution and a scalar value v, calculate X + v.
+*/
+func AddScalar(cdf CDF, v float64) CDF {
+	return &shift{cdf, v}
 }
 
-func SubtractScalar(cdf CDF, x float64) CDF {
-	return &shift{cdf, -x}
+/*
+Given a random variable X represented by a distribution and a scalar value v, calculate X - v.
+*/
+func SubtractScalar(cdf CDF, v float64) CDF {
+	return &shift{cdf, -v}
 }
 
-func MultiplyScalar(cdf CDF, x float64) CDF {
-	if x == 0 {
+/*
+Given a random variable X represented by a distribution and a scalar value v, calculate X * v.
+*/
+func MultiplyScalar(cdf CDF, v float64) CDF {
+	if v == 0 {
 		return Constant(0)
 	}
-	if x < 0 {
+	if v < 0 {
 		cdf = &negate{cdf}
-		x = -x
+		v = -v
 	}
-	return &scale{cdf, x}
+	return &scale{cdf, v}
 }
 
-func DivideScalar(cdf CDF, x float64) CDF {
-	if x == 0 {
+/*
+Given a random variable X represented by a distribution and a scalar value v, calculate X / v.
+Returns NaN if v == 0.
+*/
+func DivideScalar(cdf CDF, v float64) CDF {
+	if v == 0 {
 		return NaN
 	}
-	if x < 0 {
+	if v < 0 {
 		cdf = &negate{cdf}
-		x = -x
+		v = -v
 	}
-	return &scale{cdf, 1.0 / x}
+	return &scale{cdf, 1.0 / v}
 }
