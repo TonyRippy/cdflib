@@ -1,6 +1,7 @@
 package cdflib
 
 import (
+	"math"
 	"math/rand"
 	"sort"
 )
@@ -58,53 +59,55 @@ func MakeECDF(samples []float64) *ECDF {
 	return &ECDF{discrete{xs, ps}, n}
 }
 
-// Draws evenly-spaced samples of P(x) in the range (min, max), inclusive.
-func UniformSamples(cdf CDF, min float64, max float64, n int) []float64 {
-	if n <= 0 {
-		return []float64{}
+
+/*
+Draws n samples from a distribution such that the samples are representative
+of the original distribution.
+
+Specifically, it uses the inverse CDF and samples V(p) where p is in the range (0,1).
+We want the output samples to approximate the distribution, so this takes the following
+approach to small sample sizes:
+  0 samples = [ ]
+  1 samples = [ V(1) ]
+  2 samples = [ V(0), V(1) ]
+  3 samples = [ V(0), V(1/2), V(1) ]
+  4 samples = [ V(0), V(1/3), V(2/3), V(1) ]
+...and so forth.
+
+The one exception is that the boundary values V(0) & V(1) are not included
+if they are +/- Inf.
+*/
+func UniformSamples(cdf CDF, n int) []float64 {
+	vs := make([]float64, 0, n)
+	if n == 0 {
+		return vs
 	}
-	if n == 1 {
-		return []float64{cdf.P(min)}
+	inv := cdf.Inverse()
+	max := inv.Value(1)
+	if !math.IsInf(max, 1) {
+		n -= 1
 	}
-	out := make([]float64, n)
-	if max < min {
-		min, max = max, min
+	if n > 0 {
+		min := inv.Value(0)
+		if !math.IsInf(min, -1) {
+			vs = append(vs, min)
+			n -= 1
+		}
 	}
-	step := (max - min) / float64(n-1)
-	x := min
-	for i := 0; i < (n - 1); i += 1 {
-		out[i] = cdf.P(x)
-		x += step
+	if n > 0 {
+		d := float64(n+1)
+		for i := 1; i <= n; i += 1 {
+			p := float64(i) / d
+			v := inv.Value(p)
+			vs = append(vs, v)
+		}
 	}
-	out[n-1] = cdf.P(max)
-	return out
+	if !math.IsInf(max, 1) {
+		vs = append(vs, max)
+	}
+	return vs
 }
 
-// Draws evenly-spaced samples of PDF(x) in the range (min, max), inclusive.
-func UniformDensitySamples(cdf CDF, min float64, max float64, n int) []float64 {
-	if n <= 0 {
-		return []float64{}
-	}
-	if n == 1 {
-		return []float64{cdf.P(min) - cdf.P(max)}
-	}
-	out := make([]float64, n)
-	if max < min {
-		min, max = max, min
-	}
-	step := (max - min) / float64(n+1)
-	x := min
-	p := cdf.P(min)
-	for i := 1; i < (n - 1); i += 1 {
-		x += step
-		p2 := cdf.P(x)
-		out[i] = (p2 - p) / step
-		p = p2
-	}
-	p2 := cdf.P(max)
-	out[n-1] = (p2 - p) / (max - x)
-	return out
-}
 
 func randomSample(inv InverseCDF) float64 {
 	var p float64

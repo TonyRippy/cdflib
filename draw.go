@@ -28,6 +28,27 @@ func findRange(cdfs []CDF, p float64) (float64, float64) {
 	return min, max
 }
 
+func sampleCDF(cdf CDF, min float64, max float64, n int) []float64 {
+	if n <= 0 {
+		return []float64{}
+	}
+	if n == 1 {
+		return []float64{cdf.P(min)}
+	}
+	out := make([]float64, n)
+	if max < min {
+		min, max = max, min
+	}
+	step := (max - min) / float64(n-1)
+	x := min
+	for i := 0; i < (n - 1); i += 1 {
+		out[i] = cdf.P(x)
+		x += step
+	}
+	out[n-1] = cdf.P(max)
+	return out
+}
+
 /*
 Plots a CDF and returns it as an image.
 
@@ -59,7 +80,7 @@ func DrawCDFs(cdfs []CDF, p float64, lineColors []color.Color, fillColors []colo
 	// Sample all cdfs.
 	samples := make([][]float64, n)
 	for i, cdf := range cdfs {
-		samples[i] = UniformSamples(cdf, minX, maxX, w)
+		samples[i] = sampleCDF(cdf, minX, maxX, w)
 	}
 
 	// For each CDF: Generate image, layer on top of existing images.
@@ -97,6 +118,31 @@ func DrawCDFs(cdfs []CDF, p float64, lineColors []color.Color, fillColors []colo
 	return img
 }
 
+func samplePDF(cdf CDF, min float64, max float64, n int) []float64 {
+	if n <= 0 {
+		return []float64{}
+	}
+	if n == 1 {
+		return []float64{cdf.P(min) - cdf.P(max)}
+	}
+	out := make([]float64, n)
+	if max < min {
+		min, max = max, min
+	}
+	step := (max - min) / float64(n+1)
+	x := min
+	p := cdf.P(min)
+	for i := 1; i < (n - 1); i += 1 {
+		x += step
+		p2 := cdf.P(x)
+		out[i] = (p2 - p) / step
+		p = p2
+	}
+	p2 := cdf.P(max)
+	out[n-1] = (p2 - p) / (max - x)
+	return out
+}
+
 /*
 Plots a PDF and returns it as an image.
 
@@ -130,7 +176,7 @@ func DrawPDFs(cdfs []CDF, p float64, lineColors []color.Color, fillColors []colo
 	maxY := 0.0
 	samples := make([][]float64, n)
 	for i, cdf := range cdfs {
-		samples[i] = UniformDensitySamples(cdf, minX, maxX, w)
+		samples[i] = samplePDF(cdf, minX, maxX, w)
 		for _, y := range samples[i] {
 			if y > maxY {
 				maxY = y
