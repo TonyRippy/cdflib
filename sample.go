@@ -79,7 +79,7 @@ if they are +/- Inf.
 */
 func UniformSamples(cdf CDF, n int) []float64 {
 	vs := make([]float64, 0, n)
-	if n == 0 {
+	if n <= 0 {
 		return vs
 	}
 	inv := cdf.Inverse()
