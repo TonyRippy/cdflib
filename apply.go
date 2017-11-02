@@ -24,7 +24,7 @@ func Apply1(A CDF, f func(float64) float64, n int) (*ECDF, error) {
 	vs := make([]float64, 0, n)
 	for _, av := range(samples) {
 		v := f(av)
-		if !(math.IsInf(v, 0) || math.IsNan(v)) {
+		if !(math.IsInf(v, 0) || math.IsNaN(v)) {
 			vs = append(vs, v)
 		}
 	}		
@@ -55,7 +55,7 @@ func Apply2(A CDF, B CDF, f func(float64, float64) float64, n int) (*ECDF, error
 	for _, a := range(as) {
 		for _, b := range(bs) {
 			v := f(a, b)
-			if !(math.IsInf(v, 0) || math.IsNan(v)) {
+			if !(math.IsInf(v, 0) || math.IsNaN(v)) {
 				vs = append(vs, v)
 			}
 		}
