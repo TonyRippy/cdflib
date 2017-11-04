@@ -16,6 +16,9 @@ func (m *max) Inverse() InverseCDF {
 	return &genericInverse{m}
 }
 
+/*
+Calculates the maximum of a set of random variables.
+*/
 func Max(cdfs ...CDF) CDF {
 	return &max{cdfs}
 }
