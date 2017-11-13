@@ -62,3 +62,30 @@ func Apply2(A CDF, B CDF, f func(float64, float64) float64, n int) (*ECDF, error
 	}
 	return MakeECDF(vs), nil
 }
+
+/*
+Like Apply2, but for three random variables.
+
+Please note that the resulting ECDF may have up to O(n^3) samples.
+You may choose to reduce this by using the ECDF's Downsample function.
+*/
+func Apply3(A CDF, B CDF, C CDF, f func(float64, float64, float64) float64, n int) (*ECDF, error) {
+	if n < 2 {
+		return nil, fmt.Errorf("You must request at least two samples, requested %d.", n)
+	}
+	as := UniformSamples(A, n)
+	bs := UniformSamples(B, n)
+	cs := UniformSamples(C, n)
+	vs := make([]float64, 0, n*n*n)
+	for _, a := range(as) {
+		for _, b := range(bs) {
+			for _, c := range(cs) {
+				v := f(a, b, c)
+				if !(math.IsInf(v, 0) || math.IsNaN(v)) {
+					vs = append(vs, v)
+				}
+			}
+		}
+	}
+	return MakeECDF(vs), nil
+}
