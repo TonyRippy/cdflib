@@ -1,8 +1,9 @@
 package cdflib
 
 /*
-An interface that represents something that can either happen or
-not happen with some probability.
+An interface that represents a boolean-typed random variable.
+Think of it as something that can either happen or not happen
+with some probability.
 */
 type Condition interface {
 	/*
