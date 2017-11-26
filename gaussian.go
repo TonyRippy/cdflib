@@ -33,6 +33,10 @@ func (n *gaussian) P(x float64) float64 {
 	return cdf((x - n.mean) / n.stddev)
 }
 
+func (n *gaussian) DX(x float64) float64 {
+	return pdf((x - n.mean) / n.stddev) / n.stddev
+}
+
 func (n *gaussian) Inverse() InverseCDF {
 	return &gaussianInverse{n}
 }
@@ -50,7 +54,7 @@ func (i *gaussianInverse) Inverse() CDF {
 }
 
 // Returns the CDF for a Gaussian (or Normal) distribution.
-func Gaussian(mean, stddev float64) CDF {
+func Gaussian(mean, stddev float64) DifferentiableCDF {
 	return &gaussian{mean, stddev}
 }
 
@@ -74,6 +78,10 @@ func (n *logNormal) P(x float64) float64 {
 	return cdf((math.Log(x) - n.mean) / n.stddev)
 }
 
+func (n *logNormal) DX(x float64) float64 {
+	return pdf((math.Log(x) - n.mean) / n.stddev) / (n.stddev * x)
+}
+
 func (n *logNormal) Inverse() InverseCDF {
 	return &logNormalInverse{n}
 }
@@ -92,6 +100,6 @@ func (i *logNormalInverse) Inverse() CDF {
 
 // Returns the CDF for a LogNormal distribution.
 // https://en.wikipedia.org/wiki/Log-normal_distribution
-func LogNormal(mean, stddev float64) CDF {
+func LogNormal(mean, stddev float64) DifferentiableCDF {
 	return &logNormal{mean, stddev}
 }

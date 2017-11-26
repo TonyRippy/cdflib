@@ -21,6 +21,18 @@ type CDF interface {
 }
 
 /*
+A CDF that has a known derivative.
+This property is required by some operations on CDFs.
+
+For more information, see:
+https://en.wikipedia.org/wiki/Differentiable_function
+*/
+type DifferentiableCDF interface {
+	CDF
+	DX(x float64) float64
+}
+
+/*
 The inverse of a cumulative distribution function.
 https://en.wikipedia.org/wiki/Quantile_function
 */
