@@ -59,12 +59,12 @@ func Gaussian(mean, stddev float64) DifferentiableCDF {
 }
 
 // Returns the CDF for a Normal (or Gaussian) distribution.
-func Normal(mean, stddev float64) CDF {
+func Normal(mean, stddev float64) DifferentiableCDF {
 	return Gaussian(mean, stddev)
 }
 
 // Shorthand for Normal(mean, stddev)
-func N(mean, stddev float64) CDF {
+func N(mean, stddev float64) DifferentiableCDF {
 	return Gaussian(mean, stddev)
 }
 
