@@ -1,0 +1,9 @@
+{
+    "argv": [
+        "cdflib-kernel",
+    	  "{connection_file}"
+    ],
+    "display_name": "cdflib",
+    "language": "cdflib",
+    "name": "cdflib"
+}
