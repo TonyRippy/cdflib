@@ -174,8 +174,7 @@ func TestDivideScalarInv(t *testing.T) {
 func TestAddCdf(t *testing.T) {
 	cdf1 := Normal(3, 5)
 	cdf2 := Normal(2, 1)
-	sum := Add(cdf1, cdf2)
-	checkSanity(sum, t)
+	sum := checkSanity(Add(cdf1, cdf2), t)
 
 	// Compute the result by sampling.
 	add2 := func(a float64, b float64) float64 {
