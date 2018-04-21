@@ -12,9 +12,8 @@ var (
 	ONE = &discrete{[]float64{1}, []float64{1}}
 
 	/*
-	  A special distribution that represents a nonsensical result.
-
-		Functions only return a IEEE 754 “not-a-number” value.
+  A special distribution that represents a nonsensical result.
+  Functions only return a IEEE 754 “not-a-number” value.
 	*/
 	NaN = &nan{}
 )

@@ -59,7 +59,6 @@ func MakeECDF(samples []float64) *ECDF {
 	return &ECDF{discrete{xs, ps}, n}
 }
 
-
 /*
 Draws n samples from a distribution such that the samples are representative
 of the original distribution.
@@ -95,7 +94,7 @@ func UniformSamples(cdf CDF, n int) []float64 {
 		}
 	}
 	if n > 0 {
-		d := float64(n+1)
+		d := float64(n + 1)
 		for i := 1; i <= n; i += 1 {
 			p := float64(i) / d
 			v := inv.Value(p)
@@ -107,7 +106,6 @@ func UniformSamples(cdf CDF, n int) []float64 {
 	}
 	return vs
 }
-
 
 func randomSample(inv InverseCDF) float64 {
 	var p float64

@@ -1,8 +1,8 @@
 package cdflib
 
 import (
-	"math"
 	math2 "github.com/TonyRippy/math"
+	"math"
 )
 
 var (
@@ -34,7 +34,7 @@ func (n *gaussian) P(x float64) float64 {
 }
 
 func (n *gaussian) DX(x float64) float64 {
-	return pdf((x - n.mean) / n.stddev) / n.stddev
+	return pdf((x-n.mean)/n.stddev) / n.stddev
 }
 
 func (n *gaussian) Inverse() InverseCDF {
@@ -74,12 +74,14 @@ type logNormal struct {
 }
 
 func (n *logNormal) P(x float64) float64 {
-	if x <= 0 { return 0 }
+	if x <= 0 {
+		return 0
+	}
 	return cdf((math.Log(x) - n.mean) / n.stddev)
 }
 
 func (n *logNormal) DX(x float64) float64 {
-	return pdf((math.Log(x) - n.mean) / n.stddev) / (n.stddev * x)
+	return pdf((math.Log(x)-n.mean)/n.stddev) / (n.stddev * x)
 }
 
 func (n *logNormal) Inverse() InverseCDF {
