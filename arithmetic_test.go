@@ -170,3 +170,25 @@ func TestDivideScalarInv(t *testing.T) {
 		t.Errorf("Expected V(%f) to be %f, was %f.", p, expected, actual)
 	}
 }
+
+func TestAddCdf(t *testing.T) {
+	cdf1 := Normal(3, 5)
+	cdf2 := Normal(2, 1)
+	sum := Add(cdf1, cdf2)
+	checkSanity(sum, t)
+
+	// Compute the result by sampling.
+	add2 := func(a float64, b float64) float64 {
+		return a + b
+	}
+	expected, _ := Apply2(cdf1, cdf2, add2, 200)
+	samples := UniformSamples(expected, 500)
+
+	// Null hypothesis is that the manually computed samples above
+	// were drawn from Add(cdf1,cdf2).
+	const a = 0.0001
+	p := 1.0 - KSTest(sum, samples)
+	if a < p {
+		t.Errorf("Null hypothesis was rejected. a = %f, was %f.", a, p)
+	}
+}

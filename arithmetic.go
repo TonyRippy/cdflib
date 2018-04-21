@@ -1,5 +1,10 @@
 package cdflib
 
+import (
+	math2 "github.com/TonyRippy/math"
+	"math"
+)
+
 type negate struct {
 	cdf CDF
 }
@@ -125,4 +130,61 @@ func DivideScalar(cdf CDF, v float64) CDF {
 		v = -v
 	}
 	return &scale{cdf, 1.0 / v}
+}
+
+type addc struct {
+	a    DifferentiableCDF
+	b    CDF
+	minx float64
+}
+
+func (c *addc) P(x float64) float64 {
+	const (
+		EPS     = 1e-10
+		SMALL_X = -1e30 // TODO: What if x < SMALL_X?
+	)
+	if math.IsInf(x, +1) {
+		return 1
+	}
+	if math.IsInf(x, -1) {
+		return 0
+	}
+	f := func(y float64) float64 {
+		a := c.a.DX(y)
+		if a == 0.0 {
+			return 0.0
+		}
+		b := c.b.P(x - y)
+		return a * b
+	}
+	var minp float64
+	if x <= c.minx {
+		minp, _ = math2.Romberg(math2.MidPointInf(f, SMALL_X, x), EPS)
+		return minp
+	}
+	minp, _ = math2.Romberg(math2.MidPointInf(f, SMALL_X, c.minx), EPS)
+	p, _ := math2.Romberg(math2.MidPoint(f, c.minx, x), EPS)
+	return minp + p
+}
+
+func (c *addc) Inverse() InverseCDF {
+	return &genericInverse{c}
+}
+
+/*
+Given random variables A and B, return a random variable that models A + B.
+*/
+func Add(a DifferentiableCDF, b CDF) CDF {
+	const (
+		SMALL_P = 1e-6
+	)
+	minx := a.Inverse().Value(SMALL_P)
+	x := b.Inverse().Value(SMALL_P)
+	if x < minx {
+		minx = x
+	}
+	if minx >= 0 {
+		minx = math.Copysign(0, -1) // negative zero
+	}
+	return &addc{a, b, minx}
 }
