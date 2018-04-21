@@ -166,6 +166,40 @@ func builtinFunctions() map[string][]*funcSpec {
 				}
 				return &cdfExpr{CDF, cdflib.AddScalar(v1, v0)}, nil
 			}},
+		&funcSpec {
+			[]argSpec{
+				argSpec{"arg0", DIFFERENTIABLE},
+				argSpec{"arg1", CDF},
+			},
+			func(args []Expression) (Expression, error) {
+				var v0 cdflib.DifferentiableCDF
+				var err error
+				if v0, err = AsDifferentiable(args[0]); err != nil {
+					return nil, fmt.Errorf("'Add, parameter 0: %s", err)
+				}
+				var v1 cdflib.CDF
+				if v1, err = AsCDF(args[1]); err != nil {
+					return nil, fmt.Errorf("'Add, parameter 1: %s", err)
+				}
+				return &cdfExpr{CDF, cdflib.Add(v0, v1)}, nil
+			}},
+		&funcSpec {
+			[]argSpec{
+				argSpec{"arg0", CDF},
+				argSpec{"arg1", DIFFERENTIABLE},
+			},
+			func(args []Expression) (Expression, error) {
+				var v0 cdflib.DifferentiableCDF
+				var err error
+				if v0, err = AsDifferentiable(args[1]); err != nil {
+					return nil, fmt.Errorf("'Add, parameter 1: %s", err)
+				}
+				var v1 cdflib.CDF
+				if v1, err = AsCDF(args[0]); err != nil {
+					return nil, fmt.Errorf("'Add, parameter 0: %s", err)
+				}
+				return &cdfExpr{CDF, cdflib.Add(v0, v1)}, nil
+			}},
 	}
 	funcs["Add"] = specs
 

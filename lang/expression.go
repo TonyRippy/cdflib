@@ -214,6 +214,18 @@ func AsCDF(expr Expression) (cdflib.CDF, error) {
 	return x.cdf, nil
 }
 
+func AsDifferentiable(expr Expression) (cdflib.DifferentiableCDF, error) {
+	x, ok := expr.(*cdfExpr)
+	if !ok {
+		return nil, errors.New("not a random variable")
+	}
+	diff, ok := x.cdf.(cdflib.DifferentiableCDF)
+	if !ok {
+		return nil, errors.New("not a differentiable variable")
+	}
+	return diff, nil
+}
+
 ///////////////////////////////
 
 type assignExpr struct {
